@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import tensorflow as tf
 
-# Load frozen inference graph
+# Load the frozen inference graph (.pb file)
 def load_graph(model_file):
     graph = tf.Graph()
     graph_def = tf.compat.v1.GraphDef()
@@ -22,7 +22,7 @@ def load_labels(labels_path):
     category_index = {i + 1: {'id': i + 1, 'name': label} for i, label in enumerate(labels)}
     return category_index
 
-# Run object detection on a frame
+# Function to run object detection on a frame
 def run_inference_for_single_image(session, image_tensor, detection_boxes, detection_scores, detection_classes, image):
     print(f"Input shape: {image.shape}, Input type: {image.dtype}")
     output_dict = session.run(
@@ -38,7 +38,7 @@ def run_inference_for_single_image(session, image_tensor, detection_boxes, detec
     print(f"Boxes shape: {output_dict['detection_boxes'].shape}, Scores shape: {output_dict['detection_scores'].shape}, Classes shape: {output_dict['detection_classes'].shape}")
     return output_dict
 
-# Draw bounding boxes on frame
+# Function to draw bounding boxes on the frame
 def draw_boxes(image, boxes, scores, classes, category_index, min_score_thresh=0.3):
     height, width, _ = image.shape
     for i in range(len(scores)):
@@ -47,7 +47,7 @@ def draw_boxes(image, boxes, scores, classes, category_index, min_score_thresh=0
             (left, right, top, bottom) = (xmin * width, xmax * width, ymin * height, ymax * height)
             cv2.rectangle(image, (int(left), int(top)), (int(right), int(bottom)), (0, 255, 0), 2)
             
-            # Handle missing class labels
+            # Handle missing class labels gracefully
             class_index = classes[i]
             print(f"Detected class index: {class_index}")  # Debug print
             if class_index in category_index:
@@ -61,11 +61,11 @@ def draw_boxes(image, boxes, scores, classes, category_index, min_score_thresh=0
     return image
 
 # Load label map
-labels_path = 'labels.txt'
+labels_path = 'C:/Users/holli/OneDrive/Code Projects/Mahjongg/test/labels.txt'
 category_index = load_labels(labels_path)
 
-# Load model
-model_file = 'model.pb'
+# Load the model
+model_file = 'C:/Users/holli/OneDrive/Code Projects/Mahjongg/test/model.pb'
 graph = load_graph(model_file)
 
 with graph.as_default():
@@ -75,7 +75,7 @@ with graph.as_default():
     detection_scores = graph.get_tensor_by_name('detected_scores:0')
     detection_classes = graph.get_tensor_by_name('detected_classes:0')
 
-# Capture video from webcam
+# Capture video from the webcam
 cap = cv2.VideoCapture(0)
 
 while True:
@@ -83,11 +83,11 @@ while True:
     if not ret:
         break
 
-    # Resize frame to 320x320 as expected by model
+    # Resize frame to 320x320 as expected by the model
     resized_frame = cv2.resize(frame, (320, 320))
     input_frame = np.expand_dims(resized_frame, axis=0)
 
-    # Ensure input frame is a numpy array with float32 type
+    # Ensure the input frame is a numpy array with float32 type
     input_frame = input_frame.astype(np.float32)
 
     # Run object detection
@@ -96,13 +96,13 @@ while True:
     # Draw boxes
     frame_with_boxes = draw_boxes(frame, output_dict['detection_boxes'], output_dict['detection_scores'], output_dict['detection_classes'], category_index, min_score_thresh=0.3)
 
-    # Display frame
+    # Display the frame
     cv2.imshow('Object Detection', frame_with_boxes)
 
-    # Exit
+    # Exit on pressing 'q'
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-# Release webcam and close windows
+# Release the webcam and close windows
 cap.release()
 cv2.destroyAllWindows()
