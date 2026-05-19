@@ -23,7 +23,7 @@ Real-time Mahjong tile detection using a TensorFlow model exported from [Azure C
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/<your-username>/mahjongg-ai-tutor.git
+   git clone https://github.com/htcooper/mahjongg-ai-tutor.git
    cd mahjongg-ai-tutor
    ```
 
